@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
-import tictactoe from './src/tictactoe';
+import { Dimensions, StyleSheet, Text, View, TouchableOpacity, Image, TouchableHighlightBase } from 'react-native';
+import ticTacToe from './src/tictactoe';
 import BlackPawn from './assets/blackPawn';
 import WhitePawn from './assets/whitePawn';
 
@@ -9,52 +9,40 @@ type Props = {};
 export default class App extends Component<Props> {
   constructor(props) {
     super(props);
-
-    tictactoe.start();
-
-    this.state = {
-      board: tictactoe.board,
-      gameOver: tictactoe.gameover,
-      velha: tictactoe.velha,
-    };
+    ticTacToe.startNewGame();
+    this.state = { ...ticTacToe };
   }
 
-  makePlay(index) {
-    tictactoe.make_play(index);
+  makePlay = (index) => {
+    ticTacToe.makePlay(index);
+    this.setState({ ...ticTacToe });
+  };
 
-    this.setState({
-      board: tictactoe.board,
-      gameOver: tictactoe.gameover,
-      velha: tictactoe.velha,
-    });
-  }
+  startNewGame = () => {
+    ticTacToe.startNewGame();
+    this.setState({ ...ticTacToe });
+  };
 
-  resetar() {
-    if (this.state.gameOver === true || this.state.velha === true) {
-      tictactoe.start();
-    }
-  }
-
-  isGameOver() {
+  showGameOver() {
     if (this.state.gameOver === true) {
       return (
         <View style={styles.content}>
-          <Text style={styles.congrats}>Parabéns, você venceu!!</Text>
-          <TouchableOpacity onPress={this.resetar()} style={styles.button}>
-            <Text style={{ color: '#F5F5F5' }}>Resetar</Text>
+          <Text style={styles.congrats}>Congratulations, {this.state.winningSymbol} won!!</Text>
+          <TouchableOpacity onPress={this.startNewGame} style={styles.button}>
+            <Text style={{ color: '#F5F5F5' }}>New game</Text>
           </TouchableOpacity>
         </View>
       );
     }
   }
 
-  isVelha() {
-    if (this.state.velha === true) {
+  showDraw() {
+    if (this.state.draw === true) {
       return (
         <View style={styles.content}>
-          <Text style={styles.congrats}>Deu velha..</Text>
-          <TouchableOpacity onPress={this.resetar()} style={styles.button}>
-            <Text style={{ color: '#F5F5F5' }}>Resetar</Text>
+          <Text style={styles.congrats}>You drew..</Text>
+          <TouchableOpacity onPress={this.restart()} style={styles.button}>
+            <Text style={{ color: '#F5F5F5' }}>New game</Text>
           </TouchableOpacity>
         </View>
       );
@@ -69,10 +57,10 @@ export default class App extends Component<Props> {
         <Text style={styles.title}>Tic tac toe</Text>
 
         <View style={styles.game}>
-          {this.state.board.map((value, index) => (
+          {this.state.squares.map((value, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.piece}
+              style={styles.square}
               onPress={() => {
                 this.makePlay(index);
               }}
@@ -81,8 +69,8 @@ export default class App extends Component<Props> {
             </TouchableOpacity>
           ))}
         </View>
-        {this.isGameOver()}
-        {this.isVelha()}
+        {this.showGameOver()}
+        {this.showDraw()}
       </View>
     );
   }
@@ -102,9 +90,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignContent: 'center',
   },
-  piece: {
-    width: Dimensions.get('window').width / 3,
-    height: Dimensions.get('window').width / 3,
+  square: {
+    width: Dimensions.get('window').width / 5,
+    height: Dimensions.get('window').width / 5,
     backgroundColor: '#909cae44',
     justifyContent: 'center',
     alignItems: 'center',
