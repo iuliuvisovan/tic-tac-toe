@@ -1,21 +1,26 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, Text, View, TouchableOpacity, Image, TouchableHighlightBase } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import ticTacToe from './src/tictactoe';
 import BlackPawn from './assets/blackPawn';
 import WhitePawn from './assets/whitePawn';
 
-type Props = {};
-export default class App extends Component<Props> {
-  constructor(props) {
-    super(props);
+export default class App extends Component {
+  state = { ...ticTacToe, selectedBoardSize: ticTacToe.boardSize + '' };
+
+  componentDidMount() {
     ticTacToe.startNewGame();
-    this.state = { ...ticTacToe };
+    this.setState({ ...ticTacToe });
   }
 
   makePlay = (index) => {
     ticTacToe.makePlay(index);
     this.setState({ ...ticTacToe });
+  };
+
+  changeBoardSize = () => {
+    ticTacToe.setBoardSize(this.state.selectedBoardSize);
+    this.startNewGame();
   };
 
   startNewGame = () => {
@@ -56,11 +61,23 @@ export default class App extends Component<Props> {
 
         <Text style={styles.title}>Tic tac toe</Text>
 
+        <View style={styles.boardSize}>
+          <Text>Board size:</Text>
+          <TextInput
+            onChangeText={(value) => this.setState({ selectedBoardSize: +value })}
+            value={this.state.selectedBoardSize + ''}
+            style={styles.boardSizeInput}
+          />
+          <TouchableOpacity style={styles.boardSizeButton} onPress={this.changeBoardSize}>
+            <Text>Set</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.game}>
           {this.state.squares.map((value, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.square}
+              style={[styles.square, squareSizeStyle(this.state.boardSize)]}
               onPress={() => {
                 this.makePlay(index);
               }}
@@ -75,6 +92,11 @@ export default class App extends Component<Props> {
     );
   }
 }
+
+const squareSizeStyle = (numberOfSquares) => ({
+  width: Dimensions.get('window').width / numberOfSquares,
+  height: Dimensions.get('window').width / numberOfSquares,
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -91,8 +113,6 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   square: {
-    width: Dimensions.get('window').width / 5,
-    height: Dimensions.get('window').width / 5,
     backgroundColor: '#909cae44',
     justifyContent: 'center',
     alignItems: 'center',
@@ -135,5 +155,27 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     fontSize: 20,
+  },
+  boardSizeInput: {
+    borderWidth: 1,
+    borderColor: '#909cae',
+    borderRadius: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    marginHorizontal: 8,
+    marginLeft: 24,
+    paddingHorizontal: 12,
+  },
+  boardSize: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  boardSizeButton: {
+    backgroundColor: '#fffb',
+    paddingVertical: 4,
+    paddingHorizontal: 24,
+    borderRadius: 6,
+    marginLeft: 24,
   },
 });

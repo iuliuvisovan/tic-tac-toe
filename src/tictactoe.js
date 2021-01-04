@@ -1,7 +1,7 @@
 export default {
   // ATTRIBUTES
-  BOARD_SIZE: 5,
-  squares: [...Array(5 * 5)],
+  boardSize: 5,
+  squares: [],
   symbols: {
     options: ['X', 'O'],
     turn_index: 0,
@@ -53,31 +53,35 @@ export default {
     return this.squares.every((x) => x !== '');
   },
 
-  isColumnWonBy: function (symbol, columnIndex) {
-    const columnValues = [...new Array(this.BOARD_SIZE)].map((_, i) => this.squares[this.BOARD_SIZE * i + columnIndex]);
+  setBoardSize(value) {
+    return (this.boardSize = value);
+  },
 
-    return columnValues.filter((x) => x == symbol).length == this.BOARD_SIZE;
+  isColumnWonBy: function (symbol, columnIndex) {
+    const columnValues = [...new Array(this.boardSize)].map((_, i) => this.squares[this.boardSize * i + columnIndex]);
+
+    return columnValues.filter((x) => x == symbol).length == this.boardSize;
   },
 
   isRowWonBy: function (symbol, rowIndex) {
-    const rowValues = this.squares.slice(rowIndex * this.BOARD_SIZE, rowIndex * this.BOARD_SIZE + this.BOARD_SIZE);
+    const rowValues = this.squares.slice(rowIndex * this.boardSize, rowIndex * this.boardSize + this.boardSize);
 
-    return rowValues.filter((x) => x === symbol).length == this.BOARD_SIZE;
+    return rowValues.filter((x) => x === symbol).length == this.boardSize;
   },
 
   isDiagonalWonBy: function (symbol) {
     return (
-      this.squares.filter((_, i) => i % (this.BOARD_SIZE + 1) == 0).filter((x) => x == symbol).length == this.BOARD_SIZE
+      this.squares.filter((_, i) => i % (this.boardSize + 1) == 0).filter((x) => x == symbol).length == this.boardSize
     );
   },
 
   isGameWonBy: function (symbol) {
-    const isAnyColumnWon = [...new Array(this.BOARD_SIZE)].some((_, i) => this.isColumnWonBy(symbol, i));
+    const isAnyColumnWon = [...new Array(this.boardSize)].some((_, i) => this.isColumnWonBy(symbol, i));
     if (isAnyColumnWon) {
       return true;
     }
 
-    const isAnyRowWon = [...new Array(this.BOARD_SIZE)].some((_, i) => this.isRowWonBy(symbol, i));
+    const isAnyRowWon = [...new Array(this.boardSize)].some((_, i) => this.isRowWonBy(symbol, i));
     if (isAnyRowWon) {
       return true;
     }
@@ -91,7 +95,7 @@ export default {
   },
 
   startNewGame: function () {
-    this.squares.fill('');
+    this.squares = [...Array(this.boardSize * this.boardSize)].fill('');
     this.gameOver = false;
     this.draw = false;
   },
